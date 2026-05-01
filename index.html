@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBD Order Manager</title>
+<style>
+  /* ── Reset & Base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0f1117;
+    --surface:   #1a1d27;
+    --surface2:  #222536;
+    --border:    #2e3248;
+    --accent:    #6c63ff;
+    --accent2:   #48cae4;
+    --success:   #2ecc71;
+    --danger:    #e74c3c;
+    --warn:      #f39c12;
+    --text:      #e8eaf0;
+    --muted:     #8b90a7;
+    --radius:    10px;
+    --font:      'Segoe UI', system-ui, sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Login ── */
+  #login-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: radial-gradient(ellipse at top, #1a1d27 0%, #0f1117 70%);
+  }
+
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+
+  .login-card .logo {
+    font-size: 2.2rem;
+    margin-bottom: 6px;
+  }
+
+  .login-card h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .login-card p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 32px;
+  }
+
+  .login-card input {
+    width: 100%;
+    padding: 13px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 1rem;
+    margin-bottom: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .login-card input:focus { border-color: var(--accent); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .btn:active { transform: scale(0.97); }
+  .btn:hover  { opacity: 0.88; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .btn-success { background: var(--success); color: #fff; }
+  .btn-danger  { background: var(--danger);  color: #fff; }
+  .btn-warn    { background: var(--warn);    color: #fff; }
+  .btn-small   { padding: 6px 12px; font-size: 0.8rem; }
+
+  .login-error {
+    color: var(--danger);
+    font-size: 0.85rem;
+    margin-top: 10px;
+    min-height: 20px;
+  }
+
+  /* ── App Shell ── */
+  #app { display: none; flex-direction: column; min-height: 100vh; }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .header-brand span { font-size: 1.5rem; }
+
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 16px 28px 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    overflow-x: auto;
+  }
+
+  .tab {
+    padding: 10px 20px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--muted);
+    border: 1px solid transparent;
+    border-bottom: none;
+    transition: color 0.2s, background 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab:hover { color: var(--text); }
+
+  .tab.active {
+    color: var(--text);
+    background: var(--bg);
+    border-color: var(--border);
+  }
+
+  /* ── Content ── */
+  .content { flex: 1; padding: 28px; max-width: 1400px; width: 100%; margin: 0 auto; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .card h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 18px;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── Stat Grid ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+  }
+
+  .stat-card .label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .stat-card .value {
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+
+  .stat-card .sub {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .color-gs  { color: #6c63ff; }
+  .color-gp  { color: #48cae4; }
+  .color-gk  { color: #f39c12; }
+  .color-xtc { color: #2ecc71; }
+  .color-profit { color: #2ecc71; }
+
+  /* ── Price Config ── */
+  .price-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .price-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+  }
+
+  .price-card h3 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .price-card label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 4px;
+    margin-top: 10px;
+  }
+
+  .price-card input {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .price-card input:focus { border-color: var(--accent); }
+
+  .price-result {
+    margin-top: 12px;
+    padding: 10px;
+    background: var(--bg);
+    border-radius: 6px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* ── Textarea ── */
+  .order-textarea {
+    width: 100%;
+    min-height: 280px;
+    padding: 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 14px;
+  }
+
+  .order-textarea:focus { border-color: var(--accent); }
+
+  .parse-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+
+  .api-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .api-row input {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 0.9rem;
+    outline: none;
+  }
+
+  .api-row input:focus { border-color: var(--accent); }
+
+  .api-row label { color: var(--muted); font-size: 0.85rem; white-space: nowrap; }
+
+  /* ── Parse Status ── */
+  .parse-status {
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 0.88rem;
+    margin-bottom: 14px;
+    display: none;
+  }
+
+  .parse-status.info    { background: #1a2744; border: 1px solid #2a4a8a; color: #7ab3ff; display: block; }
+  .parse-status.success { background: #0f2a1a; border: 1px solid #1e5c36; color: #4caf8a; display: block; }
+  .parse-status.error   { background: #2a0f0f; border: 1px solid #5c1e1e; color: #e07070; display: block; }
+
+  /* ── Table ── */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.87rem;
+  }
+
+  thead th {
+    background: var(--surface2);
+    padding: 12px 14px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  thead th:hover { color: var(--text); }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+
+  tbody td {
+    padding: 11px 14px;
+    vertical-align: top;
+    max-width: 200px;
+  }
+
+  .qty-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .badge-gs  { background: #2a1f5c; color: #6c63ff; }
+  .badge-gp  { background: #0f2a35; color: #48cae4; }
+  .badge-gk  { background: #2a1f00; color: #f39c12; }
+  .badge-xtc { background: #0f2a1a; color: #2ecc71; }
+  .badge-zero { color: var(--border); }
+
+  .notes-cell { color: var(--warn); font-size: 0.8rem; }
+  .flag-cell  { color: var(--danger); font-size: 0.8rem; }
+
+  tfoot td {
+    padding: 12px 14px;
+    font-weight: 700;
+    background: var(--surface2);
+    border-top: 2px solid var(--border);
+  }
+
+  /* ── Summary Table ── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  /* ── Filter Bar ── */
+  .filter-bar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+
+  .filter-bar input,
+  .filter-bar select {
+    padding: 9px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .filter-bar input:focus,
+  .filter-bar select:focus { border-color: var(--accent); }
+
+  .filter-bar select option { background: var(--surface); }
+
+  /* ── Profit Table ── */
+  .profit-table-wrap { overflow-x: auto; }
+  .profit-positive { color: var(--success); font-weight: 600; }
+  .profit-negative { color: var(--danger);  font-weight: 600; }
+
+  /* ── Settings ── */
+  .settings-section { margin-bottom: 28px; }
+  .settings-section h3 {
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .settings-row:last-child { border-bottom: none; }
+
+  .settings-row label { font-size: 0.9rem; color: var(--text); }
+  .settings-row .hint { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+  .settings-row input {
+    padding: 9px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 0.9rem;
+    outline: none;
+    width: 180px;
+    transition: border-color 0.2s;
+  }
+
+  .settings-row input:focus { border-color: var(--accent); }
+
+  /* ── Loading Spinner ── */
+  .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .content { padding: 16px; }
+    header { padding: 12px 16px; }
+    .tabs { padding: 12px 16px 0; }
+    .card { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ LOGIN SCREEN ══════════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="logo">🌿</div>
+    <h1>CBD Order Manager</h1>
+    <p>Sign in to access your dashboard</p>
+    <input type="text"     id="login-user" placeholder="Username" autocomplete="username">
+    <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password"
+           onkeydown="if(event.key==='Enter') doLogin()">
+    <button class="btn btn-primary" onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ══════════════════ APP ══════════════════ -->
+<div id="app">
+
+  <header>
+    <div class="header-brand">
+      <span>🌿</span> CBD Order Manager
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary btn-small" onclick="exportCSV()">⬇ Export CSV</button>
+      <button class="btn btn-danger    btn-small" onclick="doLogout()">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('dashboard')">📊 Dashboard</div>
+    <div class="tab"        onclick="showTab('entry')">📋 Enter Orders</div>
+    <div class="tab"        onclick="showTab('orders')">📦 All Orders</div>
+    <div class="tab"        onclick="showTab('profit')">💰 Profit</div>
+    <div class="tab"        onclick="showTab('settings')">⚙ Settings</div>
+  </div>
+
+  <div class="content">
+
+    <!-- ─── DASHBOARD ─── -->
+    <div class="panel active" id="panel-dashboard">
+
+      <div class="stat-grid" id="stat-grid"></div>
+
+      <div class="card">
+        <h2>Sales by Date</h2>
+        <div class="table-wrap">
+          <table id="summary-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Orders</th>
+                <th class="color-gs">GS (g)</th>
+                <th class="color-gp">GP (g)</th>
+                <th class="color-gk">GK (g)</th>
+                <th class="color-xtc">XTC (g)</th>
+                <th class="color-profit">Revenue</th>
+                <th class="color-profit">Profit</th>
+              </tr>
+            </thead>
+            <tbody id="summary-body"></tbody>
+            <tfoot id="summary-foot"></tfoot>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ─── ORDER ENTRY ─── -->
+    <div class="panel" id="panel-entry">
+
+      <div class="card">
+        <h2>OpenAI API Key</h2>
+        <div class="api-row">
+          <label>API Key:</label>
+          <input type="password" id="api-key-input"
+                 placeholder="sk-..."
+                 value="">
+          <button class="btn btn-secondary btn-small"
+                  onclick="saveApiKey()">Save Key</button>
+        </div>
+        <p style="color:var(--muted);font-size:0.8rem">
+          Your key is stored only in your browser's localStorage.
+          Get a key at
+          <a href="https://platform.openai.com/api-keys"
+             target="_blank"
+             style="color:var(--accent)">platform.openai.com</a>.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>Paste Order Sheet</h2>
+        <textarea class="order-textarea" id="order-input"
+          placeholder="Paste your raw order sheet here...
+
+Example:
+23.3.26
+
+7GS + 1GP
+
+Mr Paul McAuley
+110 Estate Road
+Glasgow G32 8BU
+
+MZ 4689 9582 8GB
+---
+5GS
+
+Ben Hogan
+35 Berwick Way
+Kettering NN15 5XF
+"></textarea>
+
+        <div class="parse-actions">
+          <button class="btn btn-primary" onclick="parseOrders()">
+            ✨ Parse Orders
+          </button>
+          <button class="btn btn-secondary" onclick="
+            document.getElementById('order-input').value=''">
+            🗑 Clear
+          </button>
+        </div>
+
+        <div class="parse-status" id="parse-status"></div>
+
+        <div id="preview-area"></div>
+      </div>
+
+    </div>
+
+    <!-- ─── ALL ORDERS ─── -->
+    <div class="panel" id="panel-orders">
+
+      <div class="card">
+        <h2>Filter & Search</h2>
+        <div class="filter-bar">
+          <input type="text" id="search-input"
+                 placeholder="Search customer / address..."
+                 oninput="renderOrdersTable()">
+          <select id="filter-date" onchange="renderOrdersTable()">
+            <option value="">All Dates</option>
+          </select>
+          <select id="filter-product" onchange="renderOrdersTable()">
+            <option value="">All Products</option>
+            <option value="GS">GS</option>
+            <option value="GP">GP</option>
+            <option value="GK">GK</option>
+            <option value="XTC">XTC</option>
+          </select>
+          <button class="btn btn-danger btn-small"
+                  onclick="clearAllOrders()">🗑 Clear All Orders</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Orders</h2>
+        <div class="table-wrap">
+          <table id="orders-table">
+            <thead>
+              <tr>
+                <th onclick="sortTable('date')">Date ↕</th>
+                <th onclick="sortTable('customer')">Customer ↕</th>
+                <th>Address</th>
+                <th>MZ Number</th>
+                <th onclick="sortTable('gs')"
+                    class="color-gs">GS ↕</th>
+                <th onclick="sortTable('gp')"
+                    class="color-gp">GP ↕</th>
+                <th onclick="sortTable('gk')"
+                    class="color-gk">GK ↕</th>
+                <th onclick="sortTable('xtc')"
+                    class="color-xtc">XTC ↕</th>
+                <th>Notes</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="orders-body"></tbody>
+            <tfoot id="orders-foot"></tfoot>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ─── PROFIT ─── -->
+    <div class="panel" id="panel-profit">
+
+      <div class="card">
+        <h2>Price Configuration — per gram</h2>
+        <div class="price-grid" id="price-grid"></div>
+      </div>
+
+      <div class="card">
+        <h2>Profit Summary</h2>
+        <div class="table-wrap profit-table-wrap">
+          <table id="profit-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Total Sold (g)</th>
+                <th>Cost / g</th>
+                <th>Retail / g</th>
+                <th>Total Cost</th>
+                <th>Total Revenue</th>
+                <th>Gross Profit</th>
+                <th>Margin %</th>
+              </tr>
+            </thead>
+            <tbody id="profit-body"></tbody>
+            <tfoot id="profit-foot"></tfoot>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Profit by Date</h2>
+        <div class="table-wrap">
+          <table id="profit-date-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th class="color-gs">GS Profit</th>
+                <th class="color-gp">GP Profit</th>
+                <th class="color-gk">GK Profit</th>
+                <th class="color-xtc">XTC Profit</th>
+                <th class="color-profit">Total Profit</th>
+              </tr>
+            </thead>
+            <tbody id="profit-date-body"></tbody>
+            <tfoot id="profit-date-foot"></tfoot>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ─── SETTINGS ─── -->
+    <div class="panel" id="panel-settings">
+
+      <div class="card">
+        <div class="settings-section">
+          <h3>Account</h3>
+          <div class="settings-row">
+            <div>
+              <div>Change Password</div>
+              <div class="hint">
+                Updates the login password stored in your browser
+              </div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <input type="password" id="new-pass"
+                     placeholder="New password">
+              <button class="btn btn-secondary btn-small"
+                      onclick="changePassword()">Update</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3>Product Names</h3>
+          <div class="settings-row">
+            <div>
+              <div>GS Label</div>
+              <div class="hint">Full name for GS product</div>
+            </div>
+            <input type="text" id="label-gs"
+                   placeholder="e.g. Greens Sara">
+          </div>
+          <div class="settings-row">
+            <div>
+              <div>GP Label</div>
+              <div class="hint">Full name for GP product</div>
+            </div>
+            <input type="text" id="label-gp"
+                   placeholder="e.g. Greens Par">
+          </div>
+          <div class="settings-row">
+            <div>
+              <div>GK Label</div>
+              <div class="hint">Full name for GK product</div>
+            </div>
+            <input type="text" id="label-gk"
+                   placeholder="e.g. Greens Kilo">
+          </div>
+          <div class="settings-row">
+            <div>
+              <div>XTC Label</div>
+              <div class="hint">Full name for XTC product</div>
+            </div>
+            <input type="text" id="label-xtc"
+                   placeholder="e.g. XTC Blend">
+          </div>
+          <div style="margin-top:16px">
+            <button class="btn btn-primary btn-small"
+                    onclick="saveLabels()">Save Labels</button>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3>Data Management</h3>
+          <div class="settings-row">
+            <div>
+              <div>Export All Data</div>
+              <div class="hint">Download as CSV</div>
+            </div>
+            <button class="btn btn-secondary btn-small"
+                    onclick="exportCSV()">⬇ Export CSV</button>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div>Clear All Orders</div>
+              <div class="hint">Permanently removes all order records</div>
+            </div>
+            <button class="btn btn-danger btn-small"
+                    onclick="clearAllOrders()">🗑 Clear All</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<script>
+/* ════════════════════════════════════════════════════
+   CONFIGURATION — change password / username here
+   ════════════════════════════════════════════════════ */
+const DEFAULT_USER = 'admin';
+const DEFAULT_PASS = 'cbd2024';
+
+/* ════════════════════════════════════════════════════
+   STATE
+   ════════════════════════════════════════════════════ */
+let orders   = [];
+let prices   = { GS:{cost:0,retail:0}, GP:{cost:0,retail:0},
+                 GK:{cost:0,retail:0}, XTC:{cost:0,retail:0} };
+let labels   = { GS:'Greens Sara', GP:'Greens Par',
+                 GK:'Greens K', XTC:'XTC Blend' };
+let sortKey  = 'date';
+let sortAsc  = true;
+let apiKey   = '';
+
+/* ════════════════════════════════════════════════════
+   BOOT
+   ════════════════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  loadStorage();
+  document.getElementById('api-key-input').value = apiKey;
+  loadSettingsInputs();
+  buildPriceCards();
+});
+
+function loadStorage() {
+  orders  = JSON.parse(localStorage.getItem('cbd_orders')  || '[]');
+  prices  = JSON.parse(localStorage.getItem('cbd_prices')  ||
+    JSON.stringify(prices));
+  labels  = JSON.parse(localStorage.getItem('cbd_labels')  ||
+    JSON.stringify(labels));
+  apiKey  = localStorage.getItem('cbd_apikey') || '';
+}
+
+function saveStorage() {
+  localStorage.setItem('cbd_orders', JSON.stringify(orders));
+  localStorage.setItem('cbd_prices', JSON.stringify(prices));
+  localStorage.setItem('cbd_labels', JSON.stringify(labels));
+}
+
+/* ════════════════════════════════════════════════════
+   LOGIN / LOGOUT
+   ════════════════════════════════════════════════════ */
+function doLogin() {
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  const storedPass = localStorage.getItem('cbd_password') || DEFAULT_PASS;
+  const storedUser = localStorage.getItem('cbd_username') || DEFAULT_USER;
+
+  if (u === storedUser && p === storedPass) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('app').style.flexDirection = 'column';
+    document.getElementById('login-error').textContent = '';
+    refreshAll();
+  } else {
+    document.getElementById('login-error').textContent =
+      'Incorrect username or password.';
+  }
+}
+
+function doLogout() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-pass').value = '';
+}
+
+function changePassword() {
+  const np = document.getElementById('new-pass').value;
+  if (!np || np.length < 4) {
+    alert('Password must be at least 4 characters.'); return;
+  }
+  localStorage.setItem('cbd_password', np);
+  document.getElementById('new-pass').value = '';
+  alert('Password updated.');
+}
+
+/* ════════════════════════════════════════════════════
+   TABS
+   ════════════════════════════════════════════════════ */
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    const panels = ['dashboard','entry','orders','profit','settings'];
+    t.classList.toggle('active', panels[i] === name);
+  });
+  document.querySelectorAll('.panel').forEach(p => {
+    p.classList.toggle('active',
+      p.id === 'panel-' + name);
+  });
+  if (name === 'dashboard') { renderDashboard(); }
+  if (name === 'orders')    { renderOrdersTable(); }
+  if (name === 'profit')    { renderProfit(); }
+  if (name === 'settings')  { loadSettingsInputs(); }
+}
+
+/* ════════════════════════════════════════════════════
+   ORDER PARSING — via OpenAI
+   ════════════════════════════════════════════════════ */
+async function parseOrders() {
+  const raw = document.getElementById('order-input').value.trim();
+  if (!raw) { setStatus('error','Please paste some orders first.'); return; }
+
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key) {
+    setStatus('error', 'Please enter your OpenAI API key above.');
+    return;
+  }
+
+  setStatus('info',
+    '<span class="spinner"></span> Parsing orders with AI…');
+
+  const systemPrompt = `You are an order parsing assistant for a CBD 
+artisan product company. Extract every order from the raw text and 
+return a JSON array. Each order object must have these exact fields:
+{
+  "date": "DD.M.YY or DD.MM.YY string exactly as written, 
+           carry forward the last seen date if no new date appears",
+  "customer": "full customer name",
+  "address": "full address on one line, comma separated",
+  "mz": "MZ tracking number or empty string",
+  "gs": number (quantity in grams for GS product, 0 if none),
+  "gp": number (quantity in grams for GP product, 0 if none),
+  "gk": number (quantity in grams for GK product, 0 if none),
+  "xtc": number (quantity in grams for XTC product, 0 if none),
+  "notes": "any special instructions or flags, empty string if none"
+}
+Rules:
+- Product codes: GS, GP, GK, XTC. 
+  Sum multiple quantities for same product on one order
+  (e.g. "7GP + 1GP" = 8 GP).
+- Ignore MZ tracking numbers when calculating products.
+- If an order line has a special note (e.g. RS, NS, BOX, DECOY, 
+  separate parcels) put it in notes.
+- Dates carry forward until a new date appears in the text.
+- Return ONLY valid JSON array, no markdown, no explanation.`;
+
+  try {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${key}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user',   content: raw }
+        ],
+        temperature: 0
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      setStatus('error',
+        `API error: ${err.error?.message || res.status}`);
+      return;
+    }
+
+    const data    = await res.json();
+    const content = data.choices[0].message.content.trim();
+    let parsed;
+
+    try {
+      // Strip markdown code fences if present
+      const clean = content
+        .replace(/^```json\s*/,'').replace(/```$/,'').trim();
+      parsed = JSON.parse(clean);
+    } catch (e) {
+      setStatus('error',
+        'Could not parse AI response. Check the console for details.');
+      console.error(content);
+      return;
+    }
+
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      setStatus('error', 'No orders found in that text.');
+      return;
+    }
+
+    // Add IDs and merge
+    parsed.forEach(o => {
+      o.id = Date.now() + Math.random();
+      o.gs  = parseFloat(o.gs)  || 0;
+      o.gp  = parseFloat(o.gp)  || 0;
+      o.gk  = parseFloat(o.gk)  || 0;
+      o.xtc = parseFloat(o.xtc) || 0;
+    });
+
+    orders = orders.concat(parsed);
+    saveStorage();
+
+    setStatus('success',
+      `✅ ${parsed.length} orders imported successfully.`);
+    showPreview(parsed);
+    document.getElementById('order-input').value = '';
+    refreshAll();
+
+  } catch (e) {
+    setStatus('error', `Network error: ${e.message}`);
+  }
+}
+
+function setStatus(type, msg) {
+  const el = document.getElementById('parse-status');
+  el.className = `parse-status ${type}`;
+  el.innerHTML = msg;
+}
+
+function showPreview(parsed) {
+  const area = document.getElementById('preview-area');
+  let html = `<div class="card">
+    <h2>Preview — ${parsed.length} Orders Imported</h2>
+    <div class="table-wrap"><table>
+    <thead><tr>
+      <th>Date</th><th>Customer</th>
+      <th class="color-gs">GS</th>
+      <th class="color-gp">GP</th>
+      <th class="color-gk">GK</th>
+      <th class="color-xtc">XTC</th>
+      <th>Notes</th>
+    </tr></thead><tbody>`;
+
+  parsed.forEach(o => {
+    html += `<tr>
+      <td>${o.date}</td>
+      <td>${esc(o.customer)}</td>
+      <td>${o.gs  > 0 ?
+        `<span class="qty-badge badge-gs">${o.gs}g</span>`:'—'}</td>
+      <td>${o.gp  > 0 ?
+        `<span class="qty-badge badge-gp">${o.gp}g</span>`:'—'}</td>
+      <td>${o.gk  > 0 ?
+        `<span class="qty-badge badge-gk">${o.gk}g</span>`:'—'}</td>
+      <td>${o.xtc > 0 ?
+        `<span class="qty-badge badge-xtc">${o.xtc}g</span>`:'—'}</td>
+      <td class="notes-cell">${esc(o.notes)}</td>
+    </tr>`;
+  });
+
+  html += '</tbody></table></div></div>';
+  area.innerHTML = html;
+}
+
+function saveApiKey() {
+  const k = document.getElementById('api-key-input').value.trim();
+  localStorage.setItem('cbd_apikey', k);
+  apiKey = k;
+  alert('API key saved.');
+}
+
+/* ════════════════════════════════════════════════════
+   DASHBOARD
+   ════════════════════════════════════════════════════ */
+function renderDashboard() {
+  const totals = calcTotals(orders);
+  const rev    = calcRevenue(totals);
+  const profit = calcProfitTotal(totals);
+
+  // Stat cards
+  const grid = document.getElementById('stat-grid');
+  grid.innerHTML = `
+    <div class="stat-card">
+      <div class="label">Total Orders</div>
+      <div class="value">${orders.length}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">${labels.GS}</div>
+      <div class="value color-gs">${fmt(totals.gs)}g</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">${labels.GP}</div>
+      <div class="value color-gp">${fmt(totals.gp)}g</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">${labels.GK}</div>
+      <div class="value color-gk">${fmt(totals.gk)}g</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">${labels.xtc || labels.XTC}</div>
+      <div class="value color-xtc">${fmt(totals.xtc)}g</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Total Revenue</div>
+      <div class="value color-profit">£${fmt2(rev)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Total Profit</div>
+      <div class="value color-profit">£${fmt2(profit)}</div>
+    </div>`;
+
+  // Summary by date
+  const byDate = groupByDate(orders);
+  const dates  = Object.keys(byDate).sort(dateSort);
+  const tbody  = document.getElementById('summary-body');
+  const tfoot  = document.getElementById('summary-foot');
+
+  let totGs=0,totGp=0,totGk=0,totXtc=0,
+      totRev=0,totProfit=0,totOrders=0;
+
+  tbody.innerHTML = dates.map(d => {
+    const rows = byDate[d];
+    const t    = calcTotals(rows);
+    const r    = calcRevenue(t);
+    const p    = calcProfitTotal(t);
+    totGs    += t.gs;  totGp    += t.gp;
+    totGk    += t.gk;  totXtc   += t.xtc;
+    totRev   += r;     totProfit += p;
+    totOrders += rows.length;
+    return `<tr>
+      <td>${d}</td>
+      <td>${rows.length}</td>
+      <td class="color-gs">${fmt(t.gs)}</td>
+      <td class="color-gp">${fmt(t.gp)}</td>
+      <td class="color-gk">${fmt(t.gk)}</td>
+      <td class="color-xtc">${fmt(t.xtc)}</td>
+      <td>£${fmt2(r)}</td>
+      <td class="${p>=0?'profit-positive':'profit-negative'}">
+        £${fmt2(p)}
+      </td>
+    </tr>`;
+  }).join('');
+
+  tfoot.innerHTML = `<tr>
+    <td>TOTAL</td>
+    <td>${totOrders}</td>
+    <td class="color-gs">${fmt(totGs)}</td>
+    <td class="color-gp">${fmt(totGp)}</td>
+    <td class="color-gk">${fmt(totGk)}</td>
+    <td class="color-xtc">${fmt(totXtc)}</td>
+    <td>£${fmt2(totRev)}</td>
+    <td class="${totProfit>=0?'profit-positive':'profit-negative'}">
+      £${fmt2(totProfit)}
+    </td>
+  </tr>`;
+}
+
+/* ════════════════════════════════════════════════════
+   ORDERS TABLE
+   ════════════════════════════════════════════════════ */
+function renderOrdersTable() {
+  const search  = (document.getElementById('search-input')?.value||'')
+                  .toLowerCase();
+  const dateF   = document.getElementById('filter-date')?.value  || '';
+  const prodF   = document.getElementById('filter-product')?.value || '';
+
+  // Populate date filter
+  const dateSelect = document.getElementById('filter-date');
+  const dates = [...new Set(orders.map(o => o.date))].sort(dateSort);
+  const curDate = dateSelect.value;
+  dateSelect.innerHTML = '<option value="">All Dates</option>' +
+    dates.map(d =>
+      `<option value="${d}" ${d===curDate?'selected':''}>${d}</option>`
+    ).join('');
+
+  let filtered = orders.filter(o => {
+    const matchSearch = !search ||
+      (o.customer||'').toLowerCase().includes(search) ||
+      (o.address ||'').toLowerCase().includes(search);
+    const matchDate   = !dateF || o.date === dateF;
+    const matchProd   = !prodF || o[prodF.toLowerCase()] > 0;
+    return matchSearch && matchDate && matchProd;
+  });
+
+  // Sort
+  filtered.sort((a, b) => {
+    let av = a[sortKey], bv = b[sortKey];
+    if (sortKey === 'date') {
+      av = parseDateVal(a.date);
+      bv = parseDateVal(b.date);
+    }
+    if (av < bv) return sortAsc ? -1 :  1;
+    if (av > bv) return sortAsc ?  1 : -1;
+    return 0;
+  });
+
+  const tbody = document.getElementById('orders-body');
+  const tfoot = document.getElementById('orders-foot');
+
+  tbody.innerHTML = filtered.map(o => `
+    <tr>
+      <td style="white-space:nowrap">${o.date}</td>
+      <td>${esc(o.customer)}</td>
+      <td style="font-size:0.8rem;color:var(--muted)">
+        ${esc(o.address)}
+      </td>
+      <td style="font-size:0.78rem;color:var(--muted)">
+        ${esc(o.mz)}
+      </td>
+      <td>${o.gs  > 0 ?
+        `<span class="qty-badge badge-gs">${o.gs}g</span>`
+        :'<span class="badge-zero">—</span>'}</td>
+      <td>${o.gp  > 0 ?
+        `<span class="qty-badge badge-gp">${o.gp}g</span>`
+        :'<span class="badge-zero">—</span>'}</td>
+      <td>${o.gk  > 0 ?
+        `<span class="qty-badge badge-gk">${o.gk}g</span>`
+        :'<span class="badge-zero">—</span>'}</td>
+      <td>${o.xtc > 0 ?
+        `<span class="qty-badge badge-xtc">${o.xtc}g</span>`
+        :'<span class="badge-zero">—</span>'}</td>
+      <td class="notes-cell">${esc(o.notes)}</td>
+      <td>
+        <button class="btn btn-danger btn-small"
+                onclick="deleteOrder(${o.id})">✕</button>
+      </td>
+    </tr>`).join('');
+
+  // Footer totals
+  const t = calcTotals(filtered);
+  tfoot.innerHTML = `<tr>
+    <td colspan="4">
+      ${filtered.length} orders shown
+    </td>
+    <td class="color-gs">${fmt(t.gs)}g</td>
+    <td class="color-gp">${fmt(t.gp)}g</td>
+    <td class="color-gk">${fmt(t.gk)}g</td>
+    <td class="color-xtc">${fmt(t.xtc)}g</td>
+    <td colspan="2"></td>
+  </tr>`;
+}
+
+function sortTable(key) {
+  if (sortKey === key) sortAsc = !sortAsc;
+  else { sortKey = key; sortAsc = true; }
+  renderOrdersTable();
+}
+
+function deleteOrder(id) {
+  if (!confirm('Delete this order?')) return;
+  orders = orders.filter(o => o.id !== id);
+  saveStorage();
+  renderOrdersTable();
+  renderDashboard();
+}
+
+function clearAllOrders() {
+  if (!confirm(
+    'This will permanently delete ALL orders. Are you sure?')
+  ) return;
+  orders = [];
+  saveStorage();
+  refreshAll();
+}
+
+/* ════════════════════════════════════════════════════
+   PROFIT
+   ════════════════════════════════════════════════════ */
+function buildPriceCards() {
+  const grid = document.getElementById('price-grid');
+  const products = ['GS','GP','GK','XTC'];
+  const colors   = {
+    GS:'color-gs', GP:'color-gp',
+    GK:'color-gk', XTC:'color-xtc'
+  };
+
+  grid.innerHTML = products.map(p => `
+    <div class="price-card">
+      <h3 class="${colors[p]}">${labels[p]} (${p})</h3>
+      <label>Cost price per gram (£)</label>
+      <input type="number" min="0" step="0.01"
+             id="cost-${p}"
+             value="${prices[p].cost}"
+             oninput="updatePrice('${p}')">
+      <label>Retail price per gram (£)</label>
+      <input type="number" min="0" step="0.01"
+             id="retail-${p}"
+             value="${prices[p].retail}"
+             oninput="updatePrice('${p}')">
+      <div class="price-result" id="result-${p}">
+        Enter prices above to see margin.
+      </div>
+    </div>`).join('');
+
+  products.forEach(p => updatePrice(p));
+}
+
+function updatePrice(p) {
+  const cost   = parseFloat(
+    document.getElementById(`cost-${p}`)?.value   || 0);
+  const retail = parseFloat(
+    document.getElementById(`retail-${p}`)?.value || 0);
+
+  prices[p] = { cost, retail };
+  localStorage.setItem('cbd_prices', JSON.stringify(prices));
+
+  const margin = retail > 0
+    ? (((retail-cost)/retail)*100).toFixed(1) : 0;
+  const profit = (retail - cost).toFixed(2);
+
+  const el = document.getElementById(`result-${p}`);
+  if (el) el.innerHTML = `
+    Profit per gram: <strong>£${profit}</strong><br>
+    Margin: <strong>${margin}%</strong>`;
+
+  if (document.getElementById('panel-profit')
+      ?.classList.contains('active')) {
+    renderProfit();
+  }
+}
+
+function renderProfit() {
+  // Rebuild price cards with current labels
+  buildPriceCards();
+
+  const products = ['GS','GP','GK','XTC'];
+  const totals   = calcTotals(orders);
+  const tbody    = document.getElementById('profit-body');
+  const tfoot    = document.getElementById('profit-foot');
+
+  let grandCost=0, grandRev=0, grandProfit=0;
+
+  tbody.innerHTML = products.map(p => {
+    const qty    = totals[p.toLowerCase()];
+    const c      = prices[p].cost;
+    const r      = prices[p].retail;
+    const cost   = qty * c;
+    const rev    = qty * r;
+    const profit = rev - cost;
+    const margin = rev > 0
+      ? ((profit/rev)*100).toFixed(1) : '—';
+    grandCost   += cost;
+    grandRev    += rev;
+    grandProfit += profit;
+    return `<tr>
+      <td><strong>${labels[p]}</strong>
+          <span style="color:var(--muted);font-size:0.8rem">
+          (${p})</span></td>
+      <td>${fmt(qty)}g</td>
+      <td>£${fmt2(c)}</td>
+      <td>£${fmt2(r)}</td>
+      <td>£${fmt2(cost)}</td>
+      <td>£${fmt2(rev)}</td>
+      <td class="${profit>=0?'profit-positive':'profit-negative'}">
+        £${fmt2(profit)}
+      </td>
+      <td class="${profit>=0?'profit-positive':'profit-negative'}">
+        ${margin}%
+      </td>
+    </tr>`;
+  }).join('');
+
+  const gm = grandRev > 0
+    ? (((grandProfit)/grandRev)*100).toFixed(1) : '—';
+  tfoot.innerHTML = `<tr>
+    <td colspan="4">TOTAL</td>
+    <td>£${fmt2(grandCost)}</td>
+    <td>£${fmt2(grandRev)}</td>
+    <td class="${grandProfit>=0?'profit-positive':'profit-negative'}">
+      £${fmt2(grandProfit)}
+    </td>
+    <td class="${grandProfit>=0?'profit-positive':'profit-negative'}">
+      ${gm}%
+    </td>
+  </tr>`;
+
+  // Profit by date
+  const byDate = groupByDate(orders);
+  const dates  = Object.keys(byDate).sort(dateSort);
+  const pdBody = document.getElementById('profit-date-body');
+  const pdFoot = document.getElementById('profit-date-foot');
+
+  let tGs=0,tGp=0,tGk=0,tXtc=0,tTot=0;
+
+  pdBody.innerHTML = dates.map(d => {
+    const rows = byDate[d];
+    const t    = calcTotals(rows);
+    const pGs  = t.gs  * (prices.GS.retail  - prices.GS.cost);
+    const pGp  = t.gp  * (prices.GP.retail  - prices.GP.cost);
+    const pGk  = t.gk  * (prices.GK.retail  - prices.GK.cost);
+    const pXtc = t.xtc * (prices.XTC.retail - prices.XTC.cost);
+    const tot  = pGs + pGp + pGk + pXtc;
+    tGs+=pGs; tGp+=pGp; tGk+=pGk; tXtc+=pXtc; tTot+=tot;
+    const pc = v =>
+      `<td class="${v>=0?'profit-positive':'profit-negative'}">
+        £${fmt2(v)}
+      </td>`;
+    return `<tr>
+      <td>${d}</td>
+      ${pc(pGs)}${pc(pGp)}${pc(pGk)}${pc(pXtc)}${pc(tot)}
+    </tr>`;
+  }).join('');
+
+  const pc2 = v =>
+    `<td class="${v>=0?'profit-positive':'profit-negative'}">
+      £${fmt2(v)}
+    </td>`;
+  pdFoot.innerHTML = `<tr>
+    <td>TOTAL</td>
+    ${pc2(tGs)}${pc2(tGp)}${pc2(tGk)}${pc2(tXtc)}${pc2(tTot)}
+  </tr>`;
+}
+
+/* ════════════════════════════════════════════════════
+   SETTINGS
+   ════════════════════════════════════════════════════ */
+function loadSettingsInputs() {
+  ['gs','gp','gk','xtc'].forEach(p => {
+    const el = document.getElementById(`label-${p}`);
+    if (el) el.value = labels[p.toUpperCase()] || '';
+  });
+}
+
+function saveLabels() {
+  ['GS','GP','GK','XTC'].forEach(p => {
+    const el = document.getElementById(
+      `label-${p.toLowerCase()}`);
+    if (el && el.value.trim()) labels[p] = el.value.trim();
+  });
+  localStorage.setItem('cbd_labels', JSON.stringify(labels));
+  alert('Labels saved.');
+  buildPriceCards();
+}
+
+/* ════════════════════════════════════════════════════
+   EXPORT
+   ════════════════════════════════════════════════════ */
+function exportCSV() {
+  const headers = [
+    'Date','Customer','Address','MZ Number',
+    'GS (g)','GP (g)','GK (g)','XTC (g)',
+    'GS Revenue','GP Revenue','GK Revenue','XTC Revenue',
+    'Total Revenue','Gross Profit','Notes'
+  ];
+
+  const rows = orders.map(o => {
+    const gsRev  = o.gs  * prices.GS.retail;
+    const gpRev  = o.gp  * prices.GP.retail;
+    const gkRev  = o.gk  * prices.GK.retail;
+    const xtcRev = o.xtc * prices.XTC.retail;
+    const totRev = gsRev + gpRev + gkRev + xtcRev;
+    const profit =
+      o.gs  * (prices.GS.retail  - prices.GS.cost)  +
+      o.gp  * (prices.GP.retail  - prices.GP.cost)  +
+      o.gk  * (prices.GK.retail  - prices.GK.cost)  +
+      o.xtc * (prices.XTC.retail - prices.XTC.cost);
+    return [
+      o.date, o.customer, o.address, o.mz,
+      o.gs, o.gp, o.gk, o.xtc,
+      gsRev.toFixed(2), gpRev.toFixed(2),
+      gkRev.toFixed(2), xtcRev.toFixed(2),
+      totRev.toFixed(2), profit.toFixed(2),
+      o.notes
+    ].map(v => `"${String(v||'').replace(/"/g,'""')}"`);
+  });
+
+  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `cbd-orders-${
+    new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ════════════════════════════════════════════════════
+   HELPERS
+   ════════════════════════════════════════════════════ */
+function calcTotals(rows) {
+  return rows.reduce((acc, o) => {
+    acc.gs  += o.gs  || 0;
+    acc.gp  += o.gp  || 0;
+    acc.gk  += o.gk  || 0;
+    acc.xtc += o.xtc || 0;
+    return acc;
+  }, { gs:0, gp:0, gk:0, xtc:0 });
+}
+
+function calcRevenue(totals) {
+  return totals.gs  * prices.GS.retail  +
+         totals.gp  * prices.GP.retail  +
+         totals.gk  * prices.GK.retail  +
+         totals.xtc * prices.XTC.retail;
+}
+
+function calcProfitTotal(totals) {
+  return totals.gs  * (prices.GS.retail  - prices.GS.cost)  +
+         totals.gp  * (prices.GP.retail  - prices.GP.cost)  +
+         totals.gk  * (prices.GK.retail  - prices.GK.cost)  +
+         totals.xtc * (prices.XTC.retail - prices.XTC.cost);
+}
+
+function groupByDate(rows) {
+  return rows.reduce((acc, o) => {
+    const d = o.date || 'Unknown';
+    if (!acc[d]) acc[d] = [];
+    acc[d].push(o);
+    return acc;
+  }, {});
+}
+
+function parseDateVal(s) {
+  if (!s) return 0;
+  const parts = s.split('.');
+  if (parts.length < 3) return 0;
+  const [d,m,y] = parts;
+  const year = parseInt(y) + (parseInt(y) < 100 ? 2000 : 0);
+  return new Date(year, parseInt(m)-1, parseInt(d)).getTime();
+}
+
+function dateSort(a, b) {
+  return parseDateVal(a) - parseDateVal(b);
+}
+
+function esc(s) {
+  return String(s||'')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+}
+
+function fmt(n)  { return parseFloat((n||0).toFixed(2)); }
+function fmt2(n) { return parseFloat((n||0).toFixed(2)).toFixed(2); }
+
+function refreshAll() {
+  renderDashboard();
+  renderOrdersTable();
+  if (document.getElementById('panel-profit')
+      ?.classList.contains('active')) {
+    renderProfit();
+  }
+}
+</script>
+</body>
+</html>
