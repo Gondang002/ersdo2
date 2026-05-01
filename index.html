@@ -850,7 +850,7 @@ function loadStorage() {
   prices  = JSON.parse(localStorage.getItem('cbd_prices')  || JSON.stringify(prices));
   labels  = JSON.parse(localStorage.getItem('cbd_labels')  || JSON.stringify(labels));
   apiKey  = localStorage.getItem('cbd_apikey') || '';
-  model   = localStorage.getItem('cbd_model') || 'meta-llama/Llama-3.2-3B-Instruct:hf-inference';
+  model  = localStorage.getItem('cbd_model')  || 'meta-llama/Llama-3.3-70B-Instruct:cerebras';
 }
 
 function saveStorage() {
