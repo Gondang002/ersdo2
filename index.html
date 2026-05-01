@@ -977,10 +977,9 @@ Rules:
         .replace(/^```\s*/,'')
         .replace(/```$/,'')
         .trim();
-      const match = clean.match(/
-$$[\s\S]*$$
-/);
-      if (match) clean = match[0];
+      const start = clean.indexOf('[');
+const end = clean.lastIndexOf(']');
+if (start !== -1 && end !== -1) clean = clean.slice(start, end + 1);
       parsed = JSON.parse(clean);
     } catch (e) {
       setStatus('error', 'Could not parse AI response. Check console for details.');
