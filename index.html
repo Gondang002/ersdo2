@@ -755,8 +755,8 @@
               <div class="hint">Change the AI model used for parsing</div>
             </div>
           <select id="model-select" style="padding:9px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);width:280px">
-  <option value="meta-llama/Llama-3.3-70B-Instruct:cerebras">Llama 3.3 70B (Cerebras) — Fast</option>
-  <option value="meta-llama/Llama-3.1-8B-Instruct:novita">Llama 3.1 8B (Novita)</option>
+  <option value="meta-llama/Llama-3.3-70B-Instruct:novita">Llama 3.3 70B (Cerebras) — Fast</option>
+  <option value="/Llama-3.1-8B-Instruct:novita">Llama 3.1 8B (Novita)</option>
   <option value="Qwen/Qwen2.5-72B-Instruct:together">Qwen 2.5 72B (Together)</option>
   <option value="deepseek-ai/DeepSeek-V3:novita">DeepSeek V3 (Novita) — Best</option>
   <option value="meta-llama/Llama-3.3-70B-Instruct:together">Llama 3.3 70B (Together)</option>
@@ -850,7 +850,7 @@ function loadStorage() {
   prices  = JSON.parse(localStorage.getItem('cbd_prices')  || JSON.stringify(prices));
   labels  = JSON.parse(localStorage.getItem('cbd_labels')  || JSON.stringify(labels));
   apiKey  = localStorage.getItem('cbd_apikey') || '';
-  model  = localStorage.getItem('cbd_model')  || 'meta-llama/Llama-3.3-70B-Instruct:cerebras';
+  model  = localStorage.getItem('cbd_model')  || 'meta-llama/Llama-3.3-70B-Instruct:novita';
 }
 
 function saveStorage() {
