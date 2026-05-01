@@ -429,13 +429,6 @@
     border-top: 2px solid var(--border);
   }
 
-  /* ── Summary Table ── */
-  .summary-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-  }
-
   /* ── Filter Bar ── */
   .filter-bar {
     display: flex;
@@ -522,7 +515,6 @@
 
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ── Responsive ── */
   @media (max-width: 600px) {
     .content { padding: 16px; }
     header { padding: 12px 16px; }
@@ -533,7 +525,6 @@
 </head>
 <body>
 
-<!-- ══════════════════ LOGIN SCREEN ══════════════════ -->
 <div id="login-screen">
   <div class="login-card">
     <div class="logo">🌿</div>
@@ -547,7 +538,6 @@
   </div>
 </div>
 
-<!-- ══════════════════ APP ══════════════════ -->
 <div id="app">
 
   <header>
@@ -570,7 +560,6 @@
 
   <div class="content">
 
-    <!-- ─── DASHBOARD ─── -->
     <div class="panel active" id="panel-dashboard">
 
       <div class="stat-grid" id="stat-grid"></div>
@@ -599,57 +588,37 @@
 
     </div>
 
-    <!-- ─── ORDER ENTRY ─── -->
     <div class="panel" id="panel-entry">
 
       <div class="card">
-        <h2>OpenAI API Key</h2>
+        <h2>Hugging Face Token</h2>
         <div class="api-row">
-          <label>API Key:</label>
+          <label>Token:</label>
           <input type="password" id="api-key-input"
-                 placeholder="sk-..."
+                 placeholder="hf_..."
                  value="">
           <button class="btn btn-secondary btn-small"
-                  onclick="saveApiKey()">Save Key</button>
+                  onclick="saveApiKey()">Save Token</button>
         </div>
         <p style="color:var(--muted);font-size:0.8rem">
-          Your key is stored only in your browser's localStorage.
-          Get a key at
-          <a href="https://platform.openai.com/api-keys"
+          Your token is stored only in your browser's localStorage.
+          Get a free token at
+          <a href="https://huggingface.co/settings/tokens"
              target="_blank"
-             style="color:var(--accent)">platform.openai.com</a>.
+             style="color:var(--accent)">huggingface.co/settings/tokens</a>.
         </p>
       </div>
 
       <div class="card">
         <h2>Paste Order Sheet</h2>
         <textarea class="order-textarea" id="order-input"
-          placeholder="Paste your raw order sheet here...
-
-Example:
-23.3.26
-
-7GS + 1GP
-
-Mr Paul McAuley
-110 Estate Road
-Glasgow G32 8BU
-
-MZ 4689 9582 8GB
----
-5GS
-
-Ben Hogan
-35 Berwick Way
-Kettering NN15 5XF
-"></textarea>
+          placeholder="Paste your raw order sheet here..."></textarea>
 
         <div class="parse-actions">
           <button class="btn btn-primary" onclick="parseOrders()">
             ✨ Parse Orders
           </button>
-          <button class="btn btn-secondary" onclick="
-            document.getElementById('order-input').value=''">
+          <button class="btn btn-secondary" onclick="document.getElementById('order-input').value=''">
             🗑 Clear
           </button>
         </div>
@@ -661,7 +630,6 @@ Kettering NN15 5XF
 
     </div>
 
-    <!-- ─── ALL ORDERS ─── -->
     <div class="panel" id="panel-orders">
 
       <div class="card">
@@ -695,14 +663,10 @@ Kettering NN15 5XF
                 <th onclick="sortTable('customer')">Customer ↕</th>
                 <th>Address</th>
                 <th>MZ Number</th>
-                <th onclick="sortTable('gs')"
-                    class="color-gs">GS ↕</th>
-                <th onclick="sortTable('gp')"
-                    class="color-gp">GP ↕</th>
-                <th onclick="sortTable('gk')"
-                    class="color-gk">GK ↕</th>
-                <th onclick="sortTable('xtc')"
-                    class="color-xtc">XTC ↕</th>
+                <th onclick="sortTable('gs')" class="color-gs">GS ↕</th>
+                <th onclick="sortTable('gp')" class="color-gp">GP ↕</th>
+                <th onclick="sortTable('gk')" class="color-gk">GK ↕</th>
+                <th onclick="sortTable('xtc')" class="color-xtc">XTC ↕</th>
                 <th>Notes</th>
                 <th></th>
               </tr>
@@ -715,7 +679,6 @@ Kettering NN15 5XF
 
     </div>
 
-    <!-- ─── PROFIT ─── -->
     <div class="panel" id="panel-profit">
 
       <div class="card">
@@ -767,7 +730,6 @@ Kettering NN15 5XF
 
     </div>
 
-    <!-- ─── SETTINGS ─── -->
     <div class="panel" id="panel-settings">
 
       <div class="card">
@@ -776,16 +738,29 @@ Kettering NN15 5XF
           <div class="settings-row">
             <div>
               <div>Change Password</div>
-              <div class="hint">
-                Updates the login password stored in your browser
-              </div>
+              <div class="hint">Updates the login password stored in your browser</div>
             </div>
             <div style="display:flex;gap:8px">
-              <input type="password" id="new-pass"
-                     placeholder="New password">
-              <button class="btn btn-secondary btn-small"
-                      onclick="changePassword()">Update</button>
+              <input type="password" id="new-pass" placeholder="New password">
+              <button class="btn btn-secondary btn-small" onclick="changePassword()">Update</button>
             </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3>AI Model</h3>
+          <div class="settings-row">
+            <div>
+              <div>Hugging Face Model</div>
+              <div class="hint">Change the AI model used for parsing</div>
+            </div>
+            <select id="model-select" onchange="saveModel()" style="padding:9px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);width:280px">
+              <option value="meta-llama/Llama-3.2-3B-Instruct:hf-inference">Llama 3.2 3B (Fast)</option>
+              <option value="meta-llama/Llama-3.1-8B-Instruct:hf-inference">Llama 3.1 8B (Better)</option>
+              <option value="mistralai/Mistral-7B-Instruct-v0.3:hf-inference">Mistral 7B</option>
+              <option value="Qwen/Qwen2.5-7B-Instruct:hf-inference">Qwen 2.5 7B (Best)</option>
+              <option value="HuggingFaceH4/zephyr-7b-beta:hf-inference">Zephyr 7B</option>
+            </select>
           </div>
         </div>
 
@@ -796,36 +771,31 @@ Kettering NN15 5XF
               <div>GS Label</div>
               <div class="hint">Full name for GS product</div>
             </div>
-            <input type="text" id="label-gs"
-                   placeholder="e.g. Greens Sara">
+            <input type="text" id="label-gs" placeholder="e.g. Greens Sara">
           </div>
           <div class="settings-row">
             <div>
               <div>GP Label</div>
               <div class="hint">Full name for GP product</div>
             </div>
-            <input type="text" id="label-gp"
-                   placeholder="e.g. Greens Par">
+            <input type="text" id="label-gp" placeholder="e.g. Greens Par">
           </div>
           <div class="settings-row">
             <div>
               <div>GK Label</div>
               <div class="hint">Full name for GK product</div>
             </div>
-            <input type="text" id="label-gk"
-                   placeholder="e.g. Greens Kilo">
+            <input type="text" id="label-gk" placeholder="e.g. Greens Kilo">
           </div>
           <div class="settings-row">
             <div>
               <div>XTC Label</div>
               <div class="hint">Full name for XTC product</div>
             </div>
-            <input type="text" id="label-xtc"
-                   placeholder="e.g. XTC Blend">
+            <input type="text" id="label-xtc" placeholder="e.g. XTC Blend">
           </div>
           <div style="margin-top:16px">
-            <button class="btn btn-primary btn-small"
-                    onclick="saveLabels()">Save Labels</button>
+            <button class="btn btn-primary btn-small" onclick="saveLabels()">Save Labels</button>
           </div>
         </div>
 
@@ -836,35 +806,27 @@ Kettering NN15 5XF
               <div>Export All Data</div>
               <div class="hint">Download as CSV</div>
             </div>
-            <button class="btn btn-secondary btn-small"
-                    onclick="exportCSV()">⬇ Export CSV</button>
+            <button class="btn btn-secondary btn-small" onclick="exportCSV()">⬇ Export CSV</button>
           </div>
           <div class="settings-row">
             <div>
               <div>Clear All Orders</div>
               <div class="hint">Permanently removes all order records</div>
             </div>
-            <button class="btn btn-danger btn-small"
-                    onclick="clearAllOrders()">🗑 Clear All</button>
+            <button class="btn btn-danger btn-small" onclick="clearAllOrders()">🗑 Clear All</button>
           </div>
         </div>
       </div>
 
     </div>
 
-  </div><!-- /content -->
-</div><!-- /app -->
+  </div>
+</div>
 
 <script>
-/* ════════════════════════════════════════════════════
-   CONFIGURATION — change password / username here
-   ════════════════════════════════════════════════════ */
 const DEFAULT_USER = 'admin';
 const DEFAULT_PASS = 'cbd2024';
 
-/* ════════════════════════════════════════════════════
-   STATE
-   ════════════════════════════════════════════════════ */
 let orders   = [];
 let prices   = { GS:{cost:0,retail:0}, GP:{cost:0,retail:0},
                  GK:{cost:0,retail:0}, XTC:{cost:0,retail:0} };
@@ -873,24 +835,22 @@ let labels   = { GS:'Greens Sara', GP:'Greens Par',
 let sortKey  = 'date';
 let sortAsc  = true;
 let apiKey   = '';
+let model    = 'meta-llama/Llama-3.2-3B-Instruct:hf-inference';
 
-/* ════════════════════════════════════════════════════
-   BOOT
-   ════════════════════════════════════════════════════ */
 window.addEventListener('DOMContentLoaded', () => {
   loadStorage();
   document.getElementById('api-key-input').value = apiKey;
+  document.getElementById('model-select').value = model;
   loadSettingsInputs();
   buildPriceCards();
 });
 
 function loadStorage() {
   orders  = JSON.parse(localStorage.getItem('cbd_orders')  || '[]');
-  prices  = JSON.parse(localStorage.getItem('cbd_prices')  ||
-    JSON.stringify(prices));
-  labels  = JSON.parse(localStorage.getItem('cbd_labels')  ||
-    JSON.stringify(labels));
+  prices  = JSON.parse(localStorage.getItem('cbd_prices')  || JSON.stringify(prices));
+  labels  = JSON.parse(localStorage.getItem('cbd_labels')  || JSON.stringify(labels));
   apiKey  = localStorage.getItem('cbd_apikey') || '';
+  model   = localStorage.getItem('cbd_model') || 'meta-llama/Llama-3.2-3B-Instruct:hf-inference';
 }
 
 function saveStorage() {
@@ -899,9 +859,11 @@ function saveStorage() {
   localStorage.setItem('cbd_labels', JSON.stringify(labels));
 }
 
-/* ════════════════════════════════════════════════════
-   LOGIN / LOGOUT
-   ════════════════════════════════════════════════════ */
+function saveModel() {
+  model = document.getElementById('model-select').value;
+  localStorage.setItem('cbd_model', model);
+}
+
 function doLogin() {
   const u = document.getElementById('login-user').value.trim();
   const p = document.getElementById('login-pass').value;
@@ -915,8 +877,7 @@ function doLogin() {
     document.getElementById('login-error').textContent = '';
     refreshAll();
   } else {
-    document.getElementById('login-error').textContent =
-      'Incorrect username or password.';
+    document.getElementById('login-error').textContent = 'Incorrect username or password.';
   }
 }
 
@@ -936,17 +897,13 @@ function changePassword() {
   alert('Password updated.');
 }
 
-/* ════════════════════════════════════════════════════
-   TABS
-   ════════════════════════════════════════════════════ */
 function showTab(name) {
   document.querySelectorAll('.tab').forEach((t, i) => {
     const panels = ['dashboard','entry','orders','profit','settings'];
     t.classList.toggle('active', panels[i] === name);
   });
   document.querySelectorAll('.panel').forEach(p => {
-    p.classList.toggle('active',
-      p.id === 'panel-' + name);
+    p.classList.toggle('active', p.id === 'panel-' + name);
   });
   if (name === 'dashboard') { renderDashboard(); }
   if (name === 'orders')    { renderOrdersTable(); }
@@ -954,84 +911,80 @@ function showTab(name) {
   if (name === 'settings')  { loadSettingsInputs(); }
 }
 
-/* ════════════════════════════════════════════════════
-   ORDER PARSING — via OpenAI
-   ════════════════════════════════════════════════════ */
 async function parseOrders() {
   const raw = document.getElementById('order-input').value.trim();
   if (!raw) { setStatus('error','Please paste some orders first.'); return; }
 
   const key = document.getElementById('api-key-input').value.trim();
   if (!key) {
-    setStatus('error', 'Please enter your OpenAI API key above.');
+    setStatus('error', 'Please enter your Hugging Face token above.');
     return;
   }
 
-  setStatus('info',
-    '<span class="spinner"></span> Parsing orders with AI…');
+  setStatus('info', '<span class="spinner"></span> Parsing orders with AI…');
 
-  const systemPrompt = `You are an order parsing assistant for a CBD 
-artisan product company. Extract every order from the raw text and 
-return a JSON array. Each order object must have these exact fields:
+  const systemPrompt = `You are an order parsing assistant for a CBD artisan product company. Extract every order from the raw text and return ONLY a valid JSON array. Each order object must have these exact fields:
 {
-  "date": "DD.M.YY or DD.MM.YY string exactly as written, 
-           carry forward the last seen date if no new date appears",
+  "date": "DD.M.YY string exactly as written, carry forward last seen date",
   "customer": "full customer name",
   "address": "full address on one line, comma separated",
   "mz": "MZ tracking number or empty string",
-  "gs": number (quantity in grams for GS product, 0 if none),
-  "gp": number (quantity in grams for GP product, 0 if none),
-  "gk": number (quantity in grams for GK product, 0 if none),
-  "xtc": number (quantity in grams for XTC product, 0 if none),
-  "notes": "any special instructions or flags, empty string if none"
+  "gs": number for GS product grams (0 if none),
+  "gp": number for GP product grams (0 if none),
+  "gk": number for GK product grams (0 if none),
+  "xtc": number for XTC product grams (0 if none),
+  "notes": "any special instructions or empty string"
 }
 Rules:
-- Product codes: GS, GP, GK, XTC. 
-  Sum multiple quantities for same product on one order
-  (e.g. "7GP + 1GP" = 8 GP).
+- Sum multiple quantities for same product (7GP + 1GP = 8 GP).
 - Ignore MZ tracking numbers when calculating products.
-- If an order line has a special note (e.g. RS, NS, BOX, DECOY, 
-  separate parcels) put it in notes.
-- Dates carry forward until a new date appears in the text.
-- Return ONLY valid JSON array, no markdown, no explanation.`;
+- Special notes (RS, NS, BOX, DECOY) go in notes field.
+- Dates carry forward until a new date appears.
+- Return ONLY the JSON array, no markdown, no explanation, no code fences.`;
 
   try {
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    const res = await fetch('https://router.huggingface.co/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${key}`
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: model,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user',   content: raw }
+          { role: 'user', content: raw }
         ],
-        temperature: 0
+        temperature: 0,
+        max_tokens: 4000
       })
     });
 
     if (!res.ok) {
-      const err = await res.json();
-      setStatus('error',
-        `API error: ${err.error?.message || res.status}`);
+      const errText = await res.text();
+      setStatus('error', `API error: ${res.status} - ${errText.slice(0,200)}`);
+      console.error(errText);
       return;
     }
 
-    const data    = await res.json();
+    const data = await res.json();
     const content = data.choices[0].message.content.trim();
     let parsed;
 
     try {
-      // Strip markdown code fences if present
-      const clean = content
-        .replace(/^```json\s*/,'').replace(/```$/,'').trim();
+      let clean = content
+        .replace(/^```json\s*/i,'')
+        .replace(/^```\s*/,'')
+        .replace(/```$/,'')
+        .trim();
+      const match = clean.match(/
+$$[\s\S]*$$
+/);
+      if (match) clean = match[0];
       parsed = JSON.parse(clean);
     } catch (e) {
-      setStatus('error',
-        'Could not parse AI response. Check the console for details.');
-      console.error(content);
+      setStatus('error', 'Could not parse AI response. Check console for details.');
+      console.error('Raw response:', content);
       return;
     }
 
@@ -1040,7 +993,6 @@ Rules:
       return;
     }
 
-    // Add IDs and merge
     parsed.forEach(o => {
       o.id = Date.now() + Math.random();
       o.gs  = parseFloat(o.gs)  || 0;
@@ -1052,20 +1004,19 @@ Rules:
     orders = orders.concat(parsed);
     saveStorage();
 
-    setStatus('success',
-      `✅ ${parsed.length} orders imported successfully.`);
+    setStatus('success',`✅ ${parsed.length} orders imported successfully.`);
     showPreview(parsed);
     document.getElementById('order-input').value = '';
     refreshAll();
 
   } catch (e) {
-    setStatus('error', `Network error: ${e.message}`);
+    setStatus('error',`Network error: ${e.message}`);
   }
 }
 
 function setStatus(type, msg) {
   const el = document.getElementById('parse-status');
-  el.className = `parse-status ${type}`;
+  el.className =`parse-status ${type}`;
   el.innerHTML = msg;
 }
 
@@ -1087,14 +1038,10 @@ function showPreview(parsed) {
     html += `<tr>
       <td>${o.date}</td>
       <td>${esc(o.customer)}</td>
-      <td>${o.gs  > 0 ?
-        `<span class="qty-badge badge-gs">${o.gs}g</span>`:'—'}</td>
-      <td>${o.gp  > 0 ?
-        `<span class="qty-badge badge-gp">${o.gp}g</span>`:'—'}</td>
-      <td>${o.gk  > 0 ?
-        `<span class="qty-badge badge-gk">${o.gk}g</span>`:'—'}</td>
-      <td>${o.xtc > 0 ?
-        `<span class="qty-badge badge-xtc">${o.xtc}g</span>`:'—'}</td>
+      <td>${o.gs  > 0 ?`<span class="qty-badge badge-gs">${o.gs}g</span>`:'—'}</td>
+      <td>${o.gp  > 0 ?`<span class="qty-badge badge-gp">${o.gp}g</span>`:'—'}</td>
+      <td>${o.gk  > 0 ?`<span class="qty-badge badge-gk">${o.gk}g</span>`:'—'}</td>
+      <td>${o.xtc > 0 ?`<span class="qty-badge badge-xtc">${o.xtc}g</span>`:'—'}</td>
       <td class="notes-cell">${esc(o.notes)}</td>
     </tr>`;
   });
@@ -1107,18 +1054,14 @@ function saveApiKey() {
   const k = document.getElementById('api-key-input').value.trim();
   localStorage.setItem('cbd_apikey', k);
   apiKey = k;
-  alert('API key saved.');
+  alert('Token saved.');
 }
 
-/* ════════════════════════════════════════════════════
-   DASHBOARD
-   ════════════════════════════════════════════════════ */
 function renderDashboard() {
   const totals = calcTotals(orders);
   const rev    = calcRevenue(totals);
   const profit = calcProfitTotal(totals);
 
-  // Stat cards
   const grid = document.getElementById('stat-grid');
   grid.innerHTML = `
     <div class="stat-card">
@@ -1138,7 +1081,7 @@ function renderDashboard() {
       <div class="value color-gk">${fmt(totals.gk)}g</div>
     </div>
     <div class="stat-card">
-      <div class="label">${labels.xtc || labels.XTC}</div>
+      <div class="label">${labels.XTC}</div>
       <div class="value color-xtc">${fmt(totals.xtc)}g</div>
     </div>
     <div class="stat-card">
@@ -1150,14 +1093,12 @@ function renderDashboard() {
       <div class="value color-profit">£${fmt2(profit)}</div>
     </div>`;
 
-  // Summary by date
   const byDate = groupByDate(orders);
   const dates  = Object.keys(byDate).sort(dateSort);
   const tbody  = document.getElementById('summary-body');
   const tfoot  = document.getElementById('summary-foot');
 
-  let totGs=0,totGp=0,totGk=0,totXtc=0,
-      totRev=0,totProfit=0,totOrders=0;
+  let totGs=0,totGp=0,totGk=0,totXtc=0,totRev=0,totProfit=0,totOrders=0;
 
   tbody.innerHTML = dates.map(d => {
     const rows = byDate[d];
@@ -1176,9 +1117,7 @@ function renderDashboard() {
       <td class="color-gk">${fmt(t.gk)}</td>
       <td class="color-xtc">${fmt(t.xtc)}</td>
       <td>£${fmt2(r)}</td>
-      <td class="${p>=0?'profit-positive':'profit-negative'}">
-        £${fmt2(p)}
-      </td>
+      <td class="${p>=0?'profit-positive':'profit-negative'}">£${fmt2(p)}</td>
     </tr>`;
   }).join('');
 
@@ -1190,29 +1129,20 @@ function renderDashboard() {
     <td class="color-gk">${fmt(totGk)}</td>
     <td class="color-xtc">${fmt(totXtc)}</td>
     <td>£${fmt2(totRev)}</td>
-    <td class="${totProfit>=0?'profit-positive':'profit-negative'}">
-      £${fmt2(totProfit)}
-    </td>
+    <td class="${totProfit>=0?'profit-positive':'profit-negative'}">£${fmt2(totProfit)}</td>
   </tr>`;
 }
 
-/* ════════════════════════════════════════════════════
-   ORDERS TABLE
-   ════════════════════════════════════════════════════ */
 function renderOrdersTable() {
-  const search  = (document.getElementById('search-input')?.value||'')
-                  .toLowerCase();
+  const search  = (document.getElementById('search-input')?.value||'').toLowerCase();
   const dateF   = document.getElementById('filter-date')?.value  || '';
   const prodF   = document.getElementById('filter-product')?.value || '';
 
-  // Populate date filter
   const dateSelect = document.getElementById('filter-date');
   const dates = [...new Set(orders.map(o => o.date))].sort(dateSort);
   const curDate = dateSelect.value;
   dateSelect.innerHTML = '<option value="">All Dates</option>' +
-    dates.map(d =>
-      `<option value="${d}" ${d===curDate?'selected':''}>${d}</option>`
-    ).join('');
+    dates.map(d =>`<option value="${d}" ${d===curDate?'selected':''}>${d}</option>`).join('');
 
   let filtered = orders.filter(o => {
     const matchSearch = !search ||
@@ -1223,7 +1153,6 @@ function renderOrdersTable() {
     return matchSearch && matchDate && matchProd;
   });
 
-  // Sort
   filtered.sort((a, b) => {
     let av = a[sortKey], bv = b[sortKey];
     if (sortKey === 'date') {
@@ -1242,37 +1171,19 @@ function renderOrdersTable() {
     <tr>
       <td style="white-space:nowrap">${o.date}</td>
       <td>${esc(o.customer)}</td>
-      <td style="font-size:0.8rem;color:var(--muted)">
-        ${esc(o.address)}
-      </td>
-      <td style="font-size:0.78rem;color:var(--muted)">
-        ${esc(o.mz)}
-      </td>
-      <td>${o.gs  > 0 ?
-        `<span class="qty-badge badge-gs">${o.gs}g</span>`
-        :'<span class="badge-zero">—</span>'}</td>
-      <td>${o.gp  > 0 ?
-        `<span class="qty-badge badge-gp">${o.gp}g</span>`
-        :'<span class="badge-zero">—</span>'}</td>
-      <td>${o.gk  > 0 ?
-        `<span class="qty-badge badge-gk">${o.gk}g</span>`
-        :'<span class="badge-zero">—</span>'}</td>
-      <td>${o.xtc > 0 ?
-        `<span class="qty-badge badge-xtc">${o.xtc}g</span>`
-        :'<span class="badge-zero">—</span>'}</td>
+      <td style="font-size:0.8rem;color:var(--muted)">${esc(o.address)}</td>
+      <td style="font-size:0.78rem;color:var(--muted)">${esc(o.mz)}</td>
+      <td>${o.gs  > 0 ?`<span class="qty-badge badge-gs">${o.gs}g</span>`:'<span class="badge-zero">—</span>'}</td>
+      <td>${o.gp  > 0 ?`<span class="qty-badge badge-gp">${o.gp}g</span>`:'<span class="badge-zero">—</span>'}</td>
+      <td>${o.gk  > 0 ?`<span class="qty-badge badge-gk">${o.gk}g</span>`:'<span class="badge-zero">—</span>'}</td>
+      <td>${o.xtc > 0 ?`<span class="qty-badge badge-xtc">${o.xtc}g</span>`:'<span class="badge-zero">—</span>'}</td>
       <td class="notes-cell">${esc(o.notes)}</td>
-      <td>
-        <button class="btn btn-danger btn-small"
-                onclick="deleteOrder(${o.id})">✕</button>
-      </td>
+      <td><button class="btn btn-danger btn-small" onclick="deleteOrder(${o.id})">✕</button></td>
     </tr>`).join('');
 
-  // Footer totals
   const t = calcTotals(filtered);
   tfoot.innerHTML = `<tr>
-    <td colspan="4">
-      ${filtered.length} orders shown
-    </td>
+    <td colspan="4">${filtered.length} orders shown</td>
     <td class="color-gs">${fmt(t.gs)}g</td>
     <td class="color-gp">${fmt(t.gp)}g</td>
     <td class="color-gk">${fmt(t.gk)}g</td>
@@ -1296,72 +1207,50 @@ function deleteOrder(id) {
 }
 
 function clearAllOrders() {
-  if (!confirm(
-    'This will permanently delete ALL orders. Are you sure?')
-  ) return;
+  if (!confirm('This will permanently delete ALL orders. Are you sure?')) return;
   orders = [];
   saveStorage();
   refreshAll();
 }
 
-/* ════════════════════════════════════════════════════
-   PROFIT
-   ════════════════════════════════════════════════════ */
 function buildPriceCards() {
   const grid = document.getElementById('price-grid');
+  if (!grid) return;
   const products = ['GS','GP','GK','XTC'];
-  const colors   = {
-    GS:'color-gs', GP:'color-gp',
-    GK:'color-gk', XTC:'color-xtc'
-  };
+  const colors   = { GS:'color-gs', GP:'color-gp', GK:'color-gk', XTC:'color-xtc' };
 
   grid.innerHTML = products.map(p => `
     <div class="price-card">
       <h3 class="${colors[p]}">${labels[p]} (${p})</h3>
       <label>Cost price per gram (£)</label>
-      <input type="number" min="0" step="0.01"
-             id="cost-${p}"
-             value="${prices[p].cost}"
-             oninput="updatePrice('${p}')">
+      <input type="number" min="0" step="0.01" id="cost-${p}" value="${prices[p].cost}" oninput="updatePrice('${p}')">
       <label>Retail price per gram (£)</label>
-      <input type="number" min="0" step="0.01"
-             id="retail-${p}"
-             value="${prices[p].retail}"
-             oninput="updatePrice('${p}')">
-      <div class="price-result" id="result-${p}">
-        Enter prices above to see margin.
-      </div>
+      <input type="number" min="0" step="0.01" id="retail-${p}" value="${prices[p].retail}" oninput="updatePrice('${p}')">
+      <div class="price-result" id="result-${p}">Enter prices above to see margin.</div>
     </div>`).join('');
 
   products.forEach(p => updatePrice(p));
 }
 
 function updatePrice(p) {
-  const cost   = parseFloat(
-    document.getElementById(`cost-${p}`)?.value   || 0);
-  const retail = parseFloat(
-    document.getElementById(`retail-${p}`)?.value || 0);
+  const cost   = parseFloat(document.getElementById(`cost-${p}`)?.value   || 0);
+  const retail = parseFloat(document.getElementById(`retail-${p}`)?.value || 0);
 
   prices[p] = { cost, retail };
   localStorage.setItem('cbd_prices', JSON.stringify(prices));
 
-  const margin = retail > 0
-    ? (((retail-cost)/retail)*100).toFixed(1) : 0;
+  const margin = retail > 0 ? (((retail-cost)/retail)*100).toFixed(1) : 0;
   const profit = (retail - cost).toFixed(2);
 
   const el = document.getElementById(`result-${p}`);
-  if (el) el.innerHTML = `
-    Profit per gram: <strong>£${profit}</strong><br>
-    Margin: <strong>${margin}%</strong>`;
+  if (el) el.innerHTML =`Profit per gram: <strong>£${profit}</strong><br>Margin: <strong>${margin}%</strong>`;
 
-  if (document.getElementById('panel-profit')
-      ?.classList.contains('active')) {
+  if (document.getElementById('panel-profit')?.classList.contains('active')) {
     renderProfit();
   }
 }
 
 function renderProfit() {
-  // Rebuild price cards with current labels
   buildPriceCards();
 
   const products = ['GS','GP','GK','XTC'];
@@ -1378,44 +1267,31 @@ function renderProfit() {
     const cost   = qty * c;
     const rev    = qty * r;
     const profit = rev - cost;
-    const margin = rev > 0
-      ? ((profit/rev)*100).toFixed(1) : '—';
+    const margin = rev > 0 ? ((profit/rev)*100).toFixed(1) : '—';
     grandCost   += cost;
     grandRev    += rev;
     grandProfit += profit;
     return `<tr>
-      <td><strong>${labels[p]}</strong>
-          <span style="color:var(--muted);font-size:0.8rem">
-          (${p})</span></td>
+      <td><strong>${labels[p]}</strong> <span style="color:var(--muted);font-size:0.8rem">(${p})</span></td>
       <td>${fmt(qty)}g</td>
       <td>£${fmt2(c)}</td>
       <td>£${fmt2(r)}</td>
       <td>£${fmt2(cost)}</td>
       <td>£${fmt2(rev)}</td>
-      <td class="${profit>=0?'profit-positive':'profit-negative'}">
-        £${fmt2(profit)}
-      </td>
-      <td class="${profit>=0?'profit-positive':'profit-negative'}">
-        ${margin}%
-      </td>
+      <td class="${profit>=0?'profit-positive':'profit-negative'}">£${fmt2(profit)}</td>
+      <td class="${profit>=0?'profit-positive':'profit-negative'}">${margin}%</td>
     </tr>`;
   }).join('');
 
-  const gm = grandRev > 0
-    ? (((grandProfit)/grandRev)*100).toFixed(1) : '—';
+  const gm = grandRev > 0 ? (((grandProfit)/grandRev)*100).toFixed(1) : '—';
   tfoot.innerHTML = `<tr>
     <td colspan="4">TOTAL</td>
     <td>£${fmt2(grandCost)}</td>
     <td>£${fmt2(grandRev)}</td>
-    <td class="${grandProfit>=0?'profit-positive':'profit-negative'}">
-      £${fmt2(grandProfit)}
-    </td>
-    <td class="${grandProfit>=0?'profit-positive':'profit-negative'}">
-      ${gm}%
-    </td>
+    <td class="${grandProfit>=0?'profit-positive':'profit-negative'}">£${fmt2(grandProfit)}</td>
+    <td class="${grandProfit>=0?'profit-positive':'profit-negative'}">${gm}%</td>
   </tr>`;
 
-  // Profit by date
   const byDate = groupByDate(orders);
   const dates  = Object.keys(byDate).sort(dateSort);
   const pdBody = document.getElementById('profit-date-body');
@@ -1432,40 +1308,26 @@ function renderProfit() {
     const pXtc = t.xtc * (prices.XTC.retail - prices.XTC.cost);
     const tot  = pGs + pGp + pGk + pXtc;
     tGs+=pGs; tGp+=pGp; tGk+=pGk; tXtc+=pXtc; tTot+=tot;
-    const pc = v =>
-      `<td class="${v>=0?'profit-positive':'profit-negative'}">
-        £${fmt2(v)}
-      </td>`;
-    return `<tr>
-      <td>${d}</td>
-      ${pc(pGs)}${pc(pGp)}${pc(pGk)}${pc(pXtc)}${pc(tot)}
-    </tr>`;
+    const pc = v =>`<td class="${v>=0?'profit-positive':'profit-negative'}">£${fmt2(v)}</td>`;
+    return`<tr><td>${d}</td>${pc(pGs)}${pc(pGp)}${pc(pGk)}${pc(pXtc)}${pc(tot)}</tr>`;
   }).join('');
 
-  const pc2 = v =>
-    `<td class="${v>=0?'profit-positive':'profit-negative'}">
-      £${fmt2(v)}
-    </td>`;
-  pdFoot.innerHTML = `<tr>
-    <td>TOTAL</td>
-    ${pc2(tGs)}${pc2(tGp)}${pc2(tGk)}${pc2(tXtc)}${pc2(tTot)}
-  </tr>`;
+  const pc2 = v =>`<td class="${v>=0?'profit-positive':'profit-negative'}">£${fmt2(v)}</td>`;
+  pdFoot.innerHTML =`<tr><td>TOTAL</td>${pc2(tGs)}${pc2(tGp)}${pc2(tGk)}${pc2(tXtc)}${pc2(tTot)}</tr>`;
 }
 
-/* ════════════════════════════════════════════════════
-   SETTINGS
-   ════════════════════════════════════════════════════ */
 function loadSettingsInputs() {
   ['gs','gp','gk','xtc'].forEach(p => {
     const el = document.getElementById(`label-${p}`);
     if (el) el.value = labels[p.toUpperCase()] || '';
   });
+  const ms = document.getElementById('model-select');
+  if (ms) ms.value = model;
 }
 
 function saveLabels() {
   ['GS','GP','GK','XTC'].forEach(p => {
-    const el = document.getElementById(
-      `label-${p.toLowerCase()}`);
+    const el = document.getElementById(`label-${p.toLowerCase()}`);
     if (el && el.value.trim()) labels[p] = el.value.trim();
   });
   localStorage.setItem('cbd_labels', JSON.stringify(labels));
@@ -1473,9 +1335,6 @@ function saveLabels() {
   buildPriceCards();
 }
 
-/* ════════════════════════════════════════════════════
-   EXPORT
-   ════════════════════════════════════════════════════ */
 function exportCSV() {
   const headers = [
     'Date','Customer','Address','MZ Number',
@@ -1502,7 +1361,7 @@ function exportCSV() {
       gkRev.toFixed(2), xtcRev.toFixed(2),
       totRev.toFixed(2), profit.toFixed(2),
       o.notes
-    ].map(v => `"${String(v||'').replace(/"/g,'""')}"`);
+    ].map(v =>`"${String(v||'').replace(/"/g,'""')}"`);
   });
 
   const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
@@ -1510,15 +1369,11 @@ function exportCSV() {
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href     = url;
-  a.download = `cbd-orders-${
-    new Date().toISOString().slice(0,10)}.csv`;
+  a.download =`cbd-orders-${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }
 
-/* ════════════════════════════════════════════════════
-   HELPERS
-   ════════════════════════════════════════════════════ */
 function calcTotals(rows) {
   return rows.reduce((acc, o) => {
     acc.gs  += o.gs  || 0;
@@ -1566,10 +1421,7 @@ function dateSort(a, b) {
 }
 
 function esc(s) {
-  return String(s||'')
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;');
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function fmt(n)  { return parseFloat((n||0).toFixed(2)); }
@@ -1578,8 +1430,7 @@ function fmt2(n) { return parseFloat((n||0).toFixed(2)).toFixed(2); }
 function refreshAll() {
   renderDashboard();
   renderOrdersTable();
-  if (document.getElementById('panel-profit')
-      ?.classList.contains('active')) {
+  if (document.getElementById('panel-profit')?.classList.contains('active')) {
     renderProfit();
   }
 }
